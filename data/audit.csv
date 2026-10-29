@@ -1,0 +1,8 @@
+AUD1008,SELF_REGISTRATION,USER_CREATED,Created user Raashi with role CUSTOMER,2026-10-26 20:26:13
+AUD1007,admin,LOGIN_SUCCESS,User authenticated successfully,2026-10-26 20:25:20
+AUD1006,john,LOGIN_SUCCESS,User authenticated successfully,2026-10-24 19:33:08
+AUD1005,admin,LOGIN_SUCCESS,User authenticated successfully,2026-10-24 19:32:45
+AUD1004,john,LOGIN_SUCCESS,User authenticated successfully,2026-10-24 19:32:45
+AUD1003,john,LOGIN_SUCCESS,User authenticated successfully,2026-10-24 19:13:03
+AUD1002,john,LOGIN_SUCCESS,User authenticated successfully,2026-10-24 19:11:49
+AUD1001,SYSTEM,SYSTEM_INITIALIZE,Seeded enterprise banking modules and security controls,2026-10-24 19:04:03

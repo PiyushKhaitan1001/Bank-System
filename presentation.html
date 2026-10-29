@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Banking - Core Java Project Presentation</title>
+    <style>
+        :root {
+            --bg-body: #070b14;
+            --slide-bg: #0e1726;
+            --slide-card-bg: #142036;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #059669;
+            --accent: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --border: #1e293b;
+            --border-highlight: rgba(16, 185, 129, 0.35);
+            --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'Consolas', 'Fira Code', 'Courier New', monospace;
+            --shadow-slide: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+        }
+
+        html.light-mode {
+            --bg-body: #cbd5e1;
+            --slide-bg: #ffffff;
+            --slide-card-bg: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #059669;
+            --primary-light: #10b981;
+            --primary-dark: #047857;
+            --accent: #0284c7;
+            --border: #e2e8f0;
+            --border-highlight: rgba(5, 150, 105, 0.3);
+            --shadow-slide: 0 20px 45px -10px rgba(15, 23, 42, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s, border-color 0.2s, color 0.15s;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1rem 1rem 3rem 1rem;
+            user-select: none;
+        }
+
+        /* Top Presentation Controls Bar */
+        .controls-bar {
+            width: 100%;
+            max-width: 1280px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: rgba(14, 23, 38, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        html.light-mode .controls-bar {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .controls-left, .controls-center, .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .btn-ctrl {
+            background: var(--slide-card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.45rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.825rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            text-decoration: none;
+        }
+
+        .btn-ctrl:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-ctrl-primary {
+            background: var(--primary);
+            color: #ffffff !important;
+            border-color: var(--primary);
+        }
+
+        .btn-ctrl-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .timer-badge {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--primary);
+            border: 1px solid var(--border-highlight);
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .slide-counter {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* 16:9 Aspect Ratio Widescreen Stage */
+        .presentation-stage {
+            width: 100%;
+            max-width: 1280px;
+            aspect-ratio: 16 / 9;
+            min-height: 720px;
+            background: var(--slide-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-slide);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            padding: 2.75rem 3.25rem 2.25rem 3.25rem;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Slide Headers */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.9rem;
+        }
+
+        .slide-tag {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .slide-tag::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 9999px;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .slide-title {
+            font-size: 1.85rem;
+            font-weight: 900;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            margin-top: 0.25rem;
+        }
+
+        .slide-subtitle {
+            font-size: 0.925rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+            font-style: italic;
+        }
+
+        .slide-meta-right {
+            text-align: right;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Slide Content Area */
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.25rem;
+        }
+
+        /* Grid Layouts inside slides */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .grid-4col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .info-card {
+            background: var(--slide-card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem 1.4rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-card.highlight {
+            border-color: var(--border-highlight);
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, var(--slide-card-bg) 100%);
+        }
+
+        .card-heading {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card-text {
+            font-size: 0.85rem;
+            line-height: 1.48;
+            color: var(--text-main);
+        }
+
+        .card-subtext {
+            font-size: 0.775rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        /* Bullet Points */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .bullet-list li {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: var(--text-main);
+            position: relative;
+            padding-left: 1.25rem;
+        }
+
+        .bullet-list li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        /* Badges */
+        .pill {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .pill-green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .pill-blue { background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .pill-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .pill-purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+        /* Code snippets */
+        .code-box {
+            background: #060a12;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 1.45;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .kw { color: #f43f5e; font-weight: 700; }
+        .type { color: #38bdf8; }
+        .fn { color: #34d399; }
+        .str { color: #fde047; }
+        .comm { color: #64748b; font-style: italic; }
+
+        /* Tables */
+        .slide-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.825rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .slide-table th {
+            background: rgba(100, 116, 139, 0.1);
+            padding: 0.65rem 0.85rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .slide-table td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .slide-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Slide Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.725rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Floating Speaker Notes Panel */
+        .speaker-notes-panel {
+            width: 100%;
+            max-width: 1280px;
+            margin-top: 1rem;
+            background: var(--slide-card-bg);
+            border: 1px dashed var(--primary);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+
+        .speaker-notes-panel.active {
+            display: block;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.65rem;
+        }
+
+        .notes-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .notes-body {
+            font-size: 0.875rem;
+            line-height: 1.55;
+            color: var(--text-main);
+        }
+
+        /* Special Slide 1 Title Elements */
+        .title-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            gap: 1.5rem;
+        }
+
+        .title-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.25rem;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 9999px;
+            font-size: 0.825rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .title-main-heading {
+            font-size: 3.25rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            background: linear-gradient(135deg, #ffffff 30%, #34d399 70%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        html.light-mode .title-main-heading {
+            background: linear-gradient(135deg, #0f172a 30%, #059669 70%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-subtext {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 820px;
+            line-height: 1.45;
+        }
+
+        .team-meta-box {
+            display: flex;
+            gap: 2rem;
+            background: var(--slide-card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.25rem 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .team-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: left;
+        }
+
+        .team-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+        }
+
+        .team-val {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .banner-7min {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1.25rem;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 9999px;
+            color: #f59e0b;
+            font-weight: 900;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Print Media Styles for High-Res PDF Export */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .controls-bar, .speaker-notes-panel {
+                display: none !important;
+            }
+            .presentation-stage {
+                max-width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                min-height: auto !important;
+                aspect-ratio: auto !important;
+            }
+            .slide {
+                display: flex !important;
+                page-break-after: always !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                padding: 2.5cm 2cm !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: none !important;
+            }
+            .info-card, .team-meta-box {
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #0f172a !important;
+            }
+            .card-text, .bullet-list li, .team-val {
+                color: #0f172a !important;
+            }
+            .title-main-heading {
+                -webkit-text-fill-color: #0f172a !important;
+                color: #0f172a !important;
+            }
+            .code-box {
+                background: #f1f5f9 !important;
+                color: #0f172a !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation & Presentation Controls -->
+    <header class="controls-bar">
+        <div class="controls-left">
+            <button class="btn-ctrl" onclick="prevSlide()" title="Previous Slide (Arrow Left)">◀ Prev</button>
+            <button class="btn-ctrl btn-ctrl-primary" onclick="nextSlide()" title="Next Slide (Arrow Right / Space)">Next ▶</button>
+            <span class="slide-counter" id="slideIndicator">SLIDE 1 OF 10</span>
+        </div>
+
+        <div class="controls-center">
+            <div class="timer-badge" id="timerBox">
+                <span>⏱</span> <span id="timerText">07:00</span>
+            </div>
+            <button class="btn-ctrl" onclick="toggleTimer()" id="timerToggleBtn">▶ Start</button>
+            <button class="btn-ctrl" onclick="resetTimer()">↺ Reset</button>
+        </div>
+
+        <div class="controls-right">
+            <button class="btn-ctrl" onclick="toggleNotes()" title="Toggle Speaker Script (Key: N)">📝 Notes</button>
+            <button class="btn-ctrl" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌓 Theme</button>
+            <button class="btn-ctrl" onclick="toggleFullScreen()" title="Fullscreen Mode (Key: F)">⛶ Fullscreen</button>
+            <button class="btn-ctrl" onclick="window.print()" title="Print or Save Presentation as PDF">🖨 Print / PDF</button>
+        </div>
+    </header>
+
+    <!-- Main Presentation Stage (16:9 Widescreen) -->
+    <main class="presentation-stage" id="presentationContainer">
+
+        <!-- ==========================================
+             SLIDE 1: TITLE SLIDE
+             ========================================== -->
+        <section class="slide active" id="slide-1">
+            <div class="title-hero">
+                <div class="title-badge-pill">
+                    <span>⚡</span> OBJECT ORIENTED PROGRAMMING • CORE JAVA PROJECT PRESENTATION
+                </div>
+
+                <h1 class="title-main-heading">Apex Banking Management System</h1>
+                <p class="title-subtext">A High-Performance Neobank Web Platform Engineered from First Principles Using 100% Core Java (JDK 17+) with Zero Frameworks and Zero External Libraries</p>
+
+                <div class="team-meta-box">
+                    <div class="team-col">
+                        <span class="team-label">Lead Student Presenter</span>
+                        <span class="team-val">Piyush Khaitan (Reg No: 2026-CS-0412)</span>
+                    </div>
+                    <div style="width:1px; background:var(--border);"></div>
+                    <div class="team-col">
+                        <span class="team-label">Team Member</span>
+                        <span class="team-val">Project Partner (Reg No: 2026-CS-0413)</span>
+                    </div>
+                    <div style="width:1px; background:var(--border);"></div>
+                    <div class="team-col">
+                        <span class="team-label">Course &amp; Academic Cohort</span>
+                        <span class="team-val">Section T4 &bull; 27 October 2026</span>
+                    </div>
+                </div>
+
+                <div class="banner-7min">
+                    <span>⏱</span> 7-MINUTE PRESENTATION &bull; USE THIS COMMON FORMAT FOR ALL PROJECTS
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>Apex Banking Enterprise Core</span>
+                <span>Section T4 &bull; Slide 1 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 2: 01 • PROBLEM
+             ========================================== -->
+        <section class="slide" id="slide-2">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">01 &bull; PROBLEM</div>
+                    <h2 class="slide-title">Problem Statement &amp; Use Case</h2>
+                    <p class="slide-subtitle">Connect the software solution to a real user need.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 40s</span><br>
+                    <span class="pill pill-green">Real-World Needs</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-2col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>🎯</span> 1. What Problem Does It Solve?</div>
+                        <p class="card-text">Modern fintech and banking solutions are excessively reliant on bloated third-party frameworks (Spring Boot, Hibernate, external SQL engines). This induces heavy runtime memory footprints, opaque abstraction leaks, and severe supply-chain vulnerability vectors.</p>
+                        <p class="card-subtext" style="margin-top:0.35rem;"><strong>The Core Solution:</strong> Apex Banking proves that an industrial-grade, zero-dependency Neobank platform can be engineered purely with <strong>Core Java (JDK 17+)</strong>—utilizing native HTTP servers, custom cryptographic hashing, plain-text persistence, and clean OOP abstractions.</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>👥</span> 2. Intended Users &amp; Realistic Use Case</div>
+                        <p class="card-text"><strong>User Personas:</strong> Retail Banking Customers (daily financial ops) and Bank Administrators/Staff (KYC, loans, audit compliance).</p>
+                        <ul class="bullet-list" style="margin-top:0.35rem;">
+                            <li><strong>Realistic Use Case:</strong> Customer <em>John</em> transfers ₹1,200 to <em>Alice</em>.</li>
+                            <li><strong>System Interaction:</strong> John logs in, enters his 4-digit security PIN. Because the transfer exceeds ₹1,000, the system triggers a <strong>2-step simulated OTP challenge</strong>. The core engine atomistically verifies reserve balances, validates recipient existence, logs debit/credit transactions, updates expense analytics, and writes to CSV persistence.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card">
+                        <div class="card-heading"><span>🌐</span> 3. Scope of the Application</div>
+                        <ul class="bullet-list">
+                            <li><strong>Multi-Tier Accounts:</strong> Savings (4% p.a.), Current (₹1,000 Overdraft), Fixed Deposit (up to 8% p.a.), Recurring Deposit.</li>
+                            <li><strong>Transactions:</strong> Direct transfers, Instant UPI (`user@apex`), Utility Bills, Standing Instructions, FX.</li>
+                            <li><strong>Administration:</strong> 1-click KYC review queue, loan amortization disbursement, dispute refunds, fraud alerts.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card highlight" style="border-left: 4px solid var(--primary); justify-content:center;">
+                        <div class="card-heading" style="font-size:1.05rem;"><span>📌</span> Clear Objective Statement</div>
+                        <p class="card-text" style="font-size:0.95rem; font-weight:700; color:var(--text-main); line-height:1.5;">
+                            &ldquo;To architect and implement a secure, fully-compliant Neobank Management System using strictly Core Java (JDK 17+) and OOP principles, delivering robust transaction processing and role-based administration with zero external dependencies.&rdquo;
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>01 &bull; PROBLEM STATEMENT</span>
+                <span>Section T4 &bull; Slide 2 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 3: 02 • OOP DESIGN
+             ========================================== -->
+        <section class="slide" id="slide-3">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">02 &bull; OOP DESIGN</div>
+                    <h2 class="slide-title">Object-Oriented Design &amp; UML</h2>
+                    <p class="slide-subtitle">Explain how the project applies the concepts taught in OOP.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 60s</span><br>
+                    <span class="pill pill-blue">Architecture</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-2col" style="grid-template-columns: 1.15fr 0.85fr;">
+                    <!-- Left: UML Diagram Box -->
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>📐</span> UML Class Relationship Hierarchy</div>
+                        <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:12px; padding:0.85rem; font-family:var(--font-mono); font-size:0.73rem; line-height:1.45; color:#38bdf8;">
+<span style="color:#f43f5e; font-weight:800;">&lt;&lt;interface&gt;&gt; BankService</span>  &lt;|..  <span style="color:#34d399; font-weight:800;">BankServiceImpl</span>  --&gt;  <span style="color:#f43f5e; font-weight:800;">&lt;&lt;interface&gt;&gt; Storage</span>
+                                      |                                   |
+                                      +-- uses                            +-- implements
+                                      |                                   |
+                                      v                                   v
+             +------------------ <span style="color:#fde047; font-weight:800;">abstract class Account</span> ------------------+   <span style="color:#34d399; font-weight:800;">FileStorage</span>
+             |                    # accountNumber, balance, nominee, branch   |
+             |                    + calculateInterest(): double [abstract]   |
+             +----------------------------------------------------------------+
+                    ^                 ^                 ^                 ^
+                    |                 |                 |                 |
+         +----------+      +----------+      +----------+      +----------+
+         |                 |                 |                 |
+<span style="color:#38bdf8;">SavingsAccount</span>    <span style="color:#38bdf8;">CurrentAccount</span>    <span style="color:#38bdf8;">FixedDepositAccount</span>   <span style="color:#38bdf8;">RecurringDepositAccount</span>
+(4% p.a. monthly) (₹1k Overdraft)   (Tenure &amp; Compounding) (Monthly Installments)
+                        </div>
+                        <p class="card-subtext"><strong>Domain Entities:</strong> <code>User</code>, <code>Transaction</code>, <code>Card</code>, <code>Loan</code>, <code>UpiProfile</code>, <code>Branch</code>, <code>Employee</code>, <code>AuditLog</code>, <code>SupportTicket</code>.</p>
+                    </div>
+
+                    <!-- Right: The 4 Pillars -->
+                    <div class="info-card">
+                        <div class="card-heading"><span>🏛</span> 4 OOP Pillars in Production</div>
+                        <div style="display:flex; flex-direction:column; gap:0.55rem;">
+                            <div>
+                                <span class="pill pill-green">Abstraction</span>
+                                <p class="card-subtext" style="margin-top:0.15rem;"><code>Account</code> defines abstract <code>calculateInterest()</code>. <code>BankService</code> and <code>Storage</code> decouple HTTP handlers from persistence.</p>
+                            </div>
+                            <div>
+                                <span class="pill pill-blue">Inheritance</span>
+                                <p class="card-subtext" style="margin-top:0.15rem;"><code>SavingsAccount</code>, <code>CurrentAccount</code>, <code>FixedDepositAccount</code>, and <code>RecurringDepositAccount</code> inherit core attributes from <code>Account</code> without duplication.</p>
+                            </div>
+                            <div>
+                                <span class="pill pill-purple">Polymorphism</span>
+                                <p class="card-subtext" style="margin-top:0.15rem;">Dynamic method dispatch: <code>calculateInterest()</code> behaves uniquely per account type. <code>List&lt;Account&gt;</code> processed uniformly during batch interest runs.</p>
+                            </div>
+                            <div>
+                                <span class="pill pill-amber">Encapsulation</span>
+                                <p class="card-subtext" style="margin-top:0.15rem;">All fields strictly <code>private</code>. Account balances can only mutate through validated <code>deposit()</code> and <code>withdraw()</code> methods.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="padding:0.75rem 1.25rem;">
+                    <span class="card-text" style="font-size:0.8rem;"><strong>Architectural Justification:</strong> Layered separation of concerns isolates presentation (<code>PageBuilder</code>), routing (<code>BankServer</code>), business logic (<code>BankServiceImpl</code>), and disk persistence (<code>FileStorage</code>). Modifying the UI or storage engine never invalidates core banking invariants.</span>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>02 &bull; OOP DESIGN &amp; ARCHITECTURE</span>
+                <span>Section T4 &bull; Slide 3 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 4: 03 • CORE JAVA
+             ========================================== -->
+        <section class="slide" id="slide-4">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">03 &bull; CORE JAVA</div>
+                    <h2 class="slide-title">Core Java Language Concepts Used</h2>
+                    <p class="slide-subtitle">Highlight the Java language features that support your implementation.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 60s</span><br>
+                    <span class="pill pill-purple">Java Features</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-4col">
+                    <div class="info-card">
+                        <div class="card-heading"><span>📦</span> Encapsulation &amp; Types</div>
+                        <ul class="bullet-list">
+                            <li>Explicit parameterized constructors with field sanitization.</li>
+                            <li>Strict <code>private</code> fields with accessor methods.</li>
+                            <li>Constants: <code>static final</code> transaction categories and interest rates.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>🧩</span> Custom Exceptions</div>
+                        <ul class="bullet-list">
+                            <li><code>InsufficientFundsException</code></li>
+                            <li><code>AccountFrozenException</code></li>
+                            <li><code>InvalidAmountException</code></li>
+                            <li><code>DailyLimitExceededException</code></li>
+                            <li>Structured <code>try-catch-finally</code> boundary protection.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>📂</span> File I/O &amp; Streams</div>
+                        <ul class="bullet-list">
+                            <li><code>BufferedReader</code> &amp; <code>BufferedWriter</code> for high-throughput CSV persistence.</li>
+                            <li>Automatic directory bootstrap and CSV recovery on boot.</li>
+                            <li>Zero external database overhead.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>🔐</span> Security &amp; Collections</div>
+                        <ul class="bullet-list">
+                            <li>Generic Collections: <code>List&lt;Account&gt;</code>, <code>Map&lt;String, User&gt;</code>.</li>
+                            <li><code>ConcurrentHashMap</code> for thread-safe session tracking.</li>
+                            <li>SHA-256 via <code>MessageDigest</code> for passwords &amp; 4-digit PINs.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>🌐</span> Built-In Web Engine (`com.sun.net.httpserver.HttpServer`)</div>
+                        <p class="card-text">Utilizes Java's built-in multi-threaded HTTP server daemon on port 8080. Implements custom routing, cookie session tokens (<code>session_id</code>), form payload URL-decoding, and static CSS serving without requiring Apache Tomcat, Servlets container, or Spring.</p>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>✨</span> Strict Clean Code Style Constraints</div>
+                        <ul class="bullet-list">
+                            <li><strong>Zero inline comments:</strong> Clean, self-documenting code with descriptive naming.</li>
+                            <li><strong>Zero switch statements:</strong> Clean, predictable <code>if-else</code> branching throughout.</li>
+                            <li><strong>Zero ternary operators (`? :`):</strong> Enforces maximum readability for evaluators.</li>
+                            <li>Modular, encapsulated methods strictly under 30 lines.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>03 &bull; CORE JAVA CONCEPTS</span>
+                <span>Section T4 &bull; Slide 4 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 5: 04 • PROGRAM DESIGN
+             ========================================== -->
+        <section class="slide" id="slide-5">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">04 &bull; PROGRAM DESIGN</div>
+                    <h2 class="slide-title">Program Flow &amp; Implementation</h2>
+                    <p class="slide-subtitle">Use a flowchart or sequence diagram to make the logic clear.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 60s</span><br>
+                    <span class="pill pill-amber">Logic &amp; Flow</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-2col" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Flow / Sequence Diagram -->
+                    <div class="info-card">
+                        <div class="card-heading"><span>🔄</span> Atomic Transaction Sequence Flow</div>
+                        <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:12px; padding:0.85rem; font-family:var(--font-mono); font-size:0.75rem; line-height:1.45; color:#f8fafc;">
+[Browser Client]  -- POST /transfers/send (source, target, amt, pin, otp) --&gt;
+[BankServer]      -- 1. Extract session cookie &amp; resolve active User --------&gt;
+[BankServiceImpl] -- 2. Authenticate 4-digit PIN via SHA-256 MessageDigest -&gt;
+                  -- 3. If amt &gt; ₹1,000, verify simulated on-screen OTP ----&gt;
+                  -- 4. Check daily cumulative transfer cap (₹5,000) --------&gt;
+                  -- 5. Query Source &amp; Target Accounts via FileStorage ------&gt;
+                  -- 6. Verify minimum reserve (₹500 Savings / Overdraft) ---&gt;
+                  -- 7. Execute Atomic Mutation: withdraw() &amp; deposit() -----&gt;
+                  -- 8. Append 2 Transaction records to ledger --------------&gt;
+[FileStorage]     -- 9. Flush updated accounts &amp; ledger to CSV on disk ------&gt;
+[BankServer]      &lt;-- 10. HTTP 302 Redirect with Flash Success Banner -------
+                        </div>
+                        <p class="card-subtext"><strong>Key Logic Decision:</strong> Multi-stage atomic validation guarantees that if any precondition fails, custom exceptions roll back the process with zero balance mutation.</p>
+                    </div>
+
+                    <!-- Code Snippet -->
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>💻</span> Core Implementation Code Snippet</div>
+                        <div class="code-box">
+<span class="kw">public synchronized void</span> <span class="fn">transfer</span>(<span class="type">User</span> u, <span class="type">String</span> srcNum, <span class="type">String</span> tgtNum, 
+                               <span class="type">double</span> amt, <span class="type">String</span> pin, <span class="type">String</span> otp) 
+                               <span class="kw">throws</span> <span class="type">BankException</span> {
+    <span class="kw">if</span> (!verifyPin(u, pin)) {
+        <span class="kw">throw new</span> <span class="type">SecurityException</span>(<span class="str">"Invalid 4-digit PIN."</span>);
+    }
+    <span class="kw">if</span> (amt &gt; <span class="type">1000.0</span> &amp;&amp; !verifyOtp(u, otp)) {
+        <span class="kw">throw new</span> <span class="type">SecurityException</span>(<span class="str">"High-value OTP required."</span>);
+    }
+    <span class="type">Account</span> src = getAccount(srcNum);
+    <span class="type">Account</span> tgt = getAccount(tgtNum);
+    <span class="kw">if</span> (src.isFrozen() || tgt.isFrozen()) {
+        <span class="kw">throw new</span> <span class="type">AccountFrozenException</span>(<span class="str">"Account is frozen."</span>);
+    }
+    src.<span class="fn">withdraw</span>(amt);
+    tgt.<span class="fn">deposit</span>(amt);
+    storage.<span class="fn">logTransaction</span>(<span class="kw">new</span> <span class="type">Transaction</span>(<span class="str">"TRANSFER"</span>, amt, srcNum, tgtNum));
+    storage.<span class="fn">saveAll</span>();
+}
+                        </div>
+                        <p class="card-subtext">Clean execution model demonstrating custom exceptions, synchronized atomic execution, and encapsulation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>04 &bull; PROGRAM FLOW &amp; IMPLEMENTATION</span>
+                <span>Section T4 &bull; Slide 5 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 6: 05 • DEMO
+             ========================================== -->
+        <section class="slide" id="slide-6">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">05 &bull; DEMO</div>
+                    <h2 class="slide-title">Application Demonstration</h2>
+                    <p class="slide-subtitle">Demonstrate the working application rather than only describing it.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 100s</span><br>
+                    <span class="pill pill-green">Live Showcase</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-3col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>⚡</span> Demo 1: Customer Neobank Portal</div>
+                        <p class="card-text"><strong>Overview &amp; Transfers Hub:</strong></p>
+                        <ul class="bullet-list">
+                            <li><strong>1-Click Quick Switcher:</strong> Sticky top bar pills &amp; login tiles to toggle instantly between Admin, Manager, Teller, John, and Alice.</li>
+                            <li><strong>Liquid Capital Hero Card:</strong> Aggregates balances, active accounts, and live KYC status badge.</li>
+                            <li><strong>Decluttered Sub-Tabs:</strong> Direct Transfer, Instant UPI (<code>user@apex</code>), Beneficiaries, Bills, Standing Instructions, FX.</li>
+                            <li><strong>2-Step PIN &amp; OTP:</strong> Real-time transfer demo with 4-digit PIN authorization and high-value OTP challenge banner.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>💳</span> Demo 2: Cards, Deposits &amp; Hub</div>
+                        <p class="card-text"><strong>Self-Service Capabilities:</strong></p>
+                        <ul class="bullet-list">
+                            <li><strong>Virtual EMV Cards:</strong> Visual chip cards with daily limit setter and 1-click Freeze/Unfreeze lock.</li>
+                            <li><strong>Chequebook Desk:</strong> 25/50/100 leaf requisition with instant status tracking.</li>
+                            <li><strong>Term Deposits:</strong> Opening Fixed Deposit vaults with automatic maturity calculation (up to 8% p.a.).</li>
+                            <li><strong>Customer Hub:</strong> Savings goals progress bars and categorized monthly expense breakdown.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>🛡️</span> Demo 3: Staff Administration</div>
+                        <p class="card-text"><strong>Operations &amp; Governance:</strong></p>
+                        <ul class="bullet-list">
+                            <li><strong>Native SVG Chart:</strong> Live Deposits vs. Withdrawals bar graph rendered without external JS libraries.</li>
+                            <li><strong>KYC Document Queue:</strong> 1-click Approve/Reject review for submitted identity documents.</li>
+                            <li><strong>Loan Disbursement:</strong> Loan applications queue with automatic monthly EMI calculation.</li>
+                            <li><strong>Batch Interest Run:</strong> Trigger automated monthly savings interest batch credit across all accounts.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card" style="padding:0.85rem 1.25rem;">
+                    <div class="card-heading" style="font-size:0.85rem;"><span>🔄</span> Object Interactions During Demonstration</div>
+                    <p class="card-subtext">The HTTP layer (<code>BankServer</code>) decodes form inputs &rarr; calls business logic on <code>BankServiceImpl</code> &rarr; accesses polymorphic <code>Account</code> instances &rarr; executes business validation &rarr; mutates state &rarr; appends <code>Transaction</code> &rarr; persists via <code>FileStorage</code> &rarr; dynamic HTML rendered by <code>PageBuilder</code>.</p>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>05 &bull; LIVE APPLICATION DEMONSTRATION</span>
+                <span>Section T4 &bull; Slide 6 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 7: 06 • TESTING
+             ========================================== -->
+        <section class="slide" id="slide-7">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">06 &bull; TESTING</div>
+                    <h2 class="slide-title">Testing, Results &amp; Limitations</h2>
+                    <p class="slide-subtitle">Provide evidence that the application behaves as expected.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 40s</span><br>
+                    <span class="pill pill-rose">Quality Assurance</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <table class="slide-table">
+                    <thead>
+                        <tr>
+                            <th>Test Case ID</th>
+                            <th>Description &amp; User Input</th>
+                            <th>Expected Behavior</th>
+                            <th>Actual Result &amp; Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>TC-01</strong></td>
+                            <td><strong>Minimum Balance Guard:</strong> Transfer ₹1,100 from Savings <code>ACC1001</code> (Balance: ₹1,500, Min: ₹500).</td>
+                            <td><code>InsufficientFundsException</code> thrown; transfer aborted; balance untouched.</td>
+                            <td><span class="pill pill-green">PASSED</span> Exception caught; error alert displayed; ₹1,500 balance intact.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TC-02</strong></td>
+                            <td><strong>Brute-Force Lockout:</strong> Enter 3 consecutive incorrect passwords on customer account <code>john</code>.</td>
+                            <td>Account flagged <code>isLocked = true</code>; all subsequent login attempts rejected.</td>
+                            <td><span class="pill pill-green">PASSED</span> Account locked on 3rd attempt; unlockable only via Admin portal or Security Qs.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TC-03</strong></td>
+                            <td><strong>High-Value OTP Challenge:</strong> Submit transfer > ₹1,000 without entering on-screen simulated OTP.</td>
+                            <td>System halts transfer; displays simulated 6-digit OTP banner; prompts verification.</td>
+                            <td><span class="pill pill-green">PASSED</span> Transfer intercepted; entering matching OTP completes transaction safely.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="grid-2col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>✅</span> Functional Scope Completed</div>
+                        <ul class="bullet-list">
+                            <li>100% of all required Core Java &amp; OOP constraints satisfied.</li>
+                            <li>Complete 4-tier account polymorphism (Savings, Current, FD, RD).</li>
+                            <li>Multi-role staff authorization (Admin, Manager, Teller, Customer).</li>
+                            <li>Full CSV auto-seeding, directory recovery, and live SVG charting.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>⚠️</span> Current Technical Limitations</div>
+                        <ul class="bullet-list">
+                            <li><strong>Storage Concurrency:</strong> CSV file persistence is optimized for single-instance applications; not designed for high-concurrency multi-threaded clustering.</li>
+                            <li><strong>In-Memory Sessions:</strong> Active HTTP session tokens reside in memory and reset upon server restart (account data in CSV is fully permanent).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>06 &bull; TESTING &amp; VERIFICATION</span>
+                <span>Section T4 &bull; Slide 7 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 8: 07 • WRAP-UP
+             ========================================== -->
+        <section class="slide" id="slide-8">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">07 &bull; WRAP-UP</div>
+                    <h2 class="slide-title">Conclusion &amp; Future Enhancements</h2>
+                    <p class="slide-subtitle">Finish with a concise summary of learning and outcomes.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Time Budget: 20s</span><br>
+                    <span class="pill pill-green">Outcomes</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-3col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>🏆</span> What the App Achieves</div>
+                        <p class="card-text">Engineered a complete, professional, zero-framework Neobank Management System powered entirely by standard Core Java (JDK 17+).</p>
+                        <p class="card-subtext" style="margin-top:0.35rem;">Delivers multi-tier accounts, atomic 2-step PIN transfers, instant UPI, loan amortization, virtual cards, KYC compliance, and staff administration without a single external library.</p>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>💡</span> Primary OOP Concept Mastered</div>
+                        <p class="card-text"><strong>Polymorphic Domain Modeling &amp; Layered Abstraction:</strong></p>
+                        <p class="card-subtext" style="margin-top:0.35rem;">Demonstrated how abstract contracts (<code>Account</code>, <code>BankService</code>, <code>Storage</code>) cleanly isolate financial business logic from HTTP transport and disk serialization, guaranteeing enterprise maintainability.</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-heading"><span>🚀</span> Realistic Future Enhancements</div>
+                        <ul class="bullet-list">
+                            <li><strong>JDBC Relational Database:</strong> Plug in PostgreSQL or SQLite via the existing <code>Storage</code> interface without changing a single line of business code.</li>
+                            <li><strong>TLS/HTTPS &amp; Biometrics:</strong> Upgrade embedded server to <code>HttpsServer</code> with SSL/TLS certificates and FIDO2 WebAuthn biometrics.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card highlight" style="border: 2px solid var(--primary); text-align:center; padding:1.25rem;">
+                    <div class="card-heading" style="justify-content:center; font-size:1.05rem;"><span>🌟</span> Final Core Java Takeaway</div>
+                    <p class="card-text" style="font-size:1rem; font-weight:800; color:var(--text-main); line-height:1.45; max-width:960px; margin:0.35rem auto 0 auto;">
+                        &ldquo;Core Java&rsquo;s standard library, when paired with disciplined object-oriented architecture, provides all the necessary architectural power to construct secure, resilient, and enterprise-grade financial software from pure first principles.&rdquo;
+                    </p>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>07 &bull; CONCLUSION &amp; TAKEAWAY</span>
+                <span>Section T4 &bull; Slide 8 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 9: PRESENTATION TIMING
+             ========================================== -->
+        <section class="slide" id="slide-9">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">PRESENTATION TIMING</div>
+                    <h2 class="slide-title">Suggested 7-Minute Presentation Flow</h2>
+                    <p class="slide-subtitle">Keep the explanation concise; the evaluator may use the remaining time for questions.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Target: 420s (7 Min)</span><br>
+                    <span class="pill pill-amber">Time Allocation</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <table class="slide-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%;">Step</th>
+                            <th style="width:25%;">Topic / Slide</th>
+                            <th style="width:15%;">Allocated Time</th>
+                            <th style="width:50%;">Speaker Focus &amp; Evaluator Cue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td><strong>Problem &amp; Use Case</strong></td>
+                            <td><span class="pill pill-green">40 sec</span></td>
+                            <td>Highlight bloated framework issues; present retail customer persona and John's ₹1,200 transfer scenario; state 1-sentence objective.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td><strong>OOP Design &amp; UML</strong></td>
+                            <td><span class="pill pill-blue">60 sec</span></td>
+                            <td>Walk through UML diagram: abstract <code>Account</code> and 4 subclasses; detail Abstraction, Inheritance, Polymorphism, and Encapsulation.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td><strong>Core Java Concepts</strong></td>
+                            <td><span class="pill pill-purple">60 sec</span></td>
+                            <td>Highlight custom exceptions, CSV file I/O, Generics Collections, SHA-256 <code>MessageDigest</code>, and embedded <code>HttpServer</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><strong>Program Flow &amp; Code</strong></td>
+                            <td><span class="pill pill-amber">60 sec</span></td>
+                            <td>Trace atomic transfer sequence flow; explain 2-step PIN &amp; high-value OTP verification with short code snippet.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td><strong>Live Application Demo</strong></td>
+                            <td><span class="pill pill-green">100 sec</span></td>
+                            <td>Demonstrate live: customer login &rarr; transfers sub-tabs &rarr; PIN/OTP execution &rarr; open FD &rarr; switch to Staff Portal &amp; SVG chart.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6</strong></td>
+                            <td><strong>Testing &amp; Limitations</strong></td>
+                            <td><span class="pill pill-rose">40 sec</span></td>
+                            <td>Present test cases (minimum balance exception, account lockout, OTP challenge); state CSV concurrency limitations honestly.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7</strong></td>
+                            <td><strong>Conclusion &amp; Q&amp;A Buffer</strong></td>
+                            <td><span class="pill pill-green">20s + 40s Q&amp;A</span></td>
+                            <td>Deliver strong 1-sentence takeaway; invite evaluator questions on OOP patterns, threading, or security.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="slide-footer">
+                <span>PRESENTATION TIMING &bull; 7-MINUTE SCHEDULE</span>
+                <span>Section T4 &bull; Slide 9 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+
+        <!-- ==========================================
+             SLIDE 10: FINAL CHECKLIST
+             ========================================== -->
+        <section class="slide" id="slide-10">
+            <header class="slide-header">
+                <div>
+                    <div class="slide-tag">FINAL CHECKLIST</div>
+                    <h2 class="slide-title">Pre-Presentation Evaluation Checklist</h2>
+                    <p class="slide-subtitle">Use this checklist before entering the evaluation room.</p>
+                </div>
+                <div class="slide-meta-right">
+                    <span>Readiness: 100%</span><br>
+                    <span class="pill pill-green">Verified</span>
+                </div>
+            </header>
+
+            <div class="slide-content">
+                <div class="grid-2col">
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>⚙️</span> TECHNICAL READINESS CHECK</div>
+                        <ul class="bullet-list">
+                            <li><strong>Clean Compilation:</strong> Codebase compiles with zero warnings or errors:<br>
+                            <code>javac -d out (Get-ChildItem -Path src -Filter *.java -Recurse | ForEach-Object { $_.FullName })</code></li>
+                            <li><strong>Server Boot Verified:</strong> Runs natively on port 8080:<br>
+                            <code>java -cp out com.bank.Main</code> &rarr; <code>http://localhost:8080</code></li>
+                            <li><strong>Pre-Seeded Test Credentials Ready:</strong><br>
+                            &bull; Admin: <code>admin</code> / <code>admin123</code> (PIN: <code>1234</code>)<br>
+                            &bull; Customer 1: <code>john</code> / <code>password123</code> (PIN: <code>1234</code>)<br>
+                            &bull; Customer 2: <code>alice</code> / <code>password123</code> (PIN: <code>1234</code>)</li>
+                            <li><strong>Backup Visuals:</strong> High-res slide deck and screenshots available offline.</li>
+                            <li><strong>Readable Snippets:</strong> Code excerpts formatted cleanly without screen dumps.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card highlight">
+                        <div class="card-heading"><span>🎓</span> OOP &amp; CORE JAVA MASTERY CHECK</div>
+                        <ul class="bullet-list">
+                            <li><strong>Can Explain Main Classes:</strong> Clear role for <code>Account</code>, <code>SavingsAccount</code>, <code>CurrentAccount</code>, <code>FixedDepositAccount</code>, <code>RecurringDepositAccount</code>.</li>
+                            <li><strong>Can Justify Interfaces:</strong> <code>BankService</code> and <code>Storage</code> decouple business logic from web and disk drivers.</li>
+                            <li><strong>Can Demonstrate Polymorphism:</strong> Dynamic method dispatch in <code>calculateInterest()</code> for different account types.</li>
+                            <li><strong>Can Explain Security Measures:</strong> SHA-256 password/PIN hashing, brute-force lockout, and high-value OTP challenge.</li>
+                            <li><strong>Both Team Members Prepared:</strong> Equal readiness to field evaluator questions on design patterns, error handling, and session state.</li>
+                            <li><strong>Zero Third-Party Libraries:</strong> Pure JDK 17+ Standard Edition only.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="slide-footer">
+                <span>10 &bull; PRE-PRESENTATION CHECKLIST</span>
+                <span>Section T4 &bull; Slide 10 of 10</span>
+                <span>OBJECT ORIENTED PROGRAMMING &bull; CORE JAVA</span>
+            </footer>
+        </section>
+
+    </main>
+
+    <!-- Floating Speaker Script Panel for Presenter Practice -->
+    <div class="speaker-notes-panel" id="speakerNotesPanel">
+        <div class="notes-header">
+            <div class="notes-title">
+                <span>🎙️</span> Presenter Verbal Script &bull; <span id="notesSlideTitle">Slide 1: Title Slide</span>
+            </div>
+            <span class="pill pill-green" id="notesTimeCue">Time: 0:00</span>
+        </div>
+        <p class="notes-body" id="notesContent">
+            Welcome evaluators. Today we are proud to present the Apex Banking Management System—a fully functional, enterprise-grade Neobank web platform engineered entirely from first principles using Core Java (JDK 17+), without relying on any external frameworks or libraries.
+        </p>
+    </div>
+
+    <!-- Presentation JavaScript Engine -->
+    <script>
+        var currentSlide = 1;
+        var totalSlides = 10;
+        var timerSeconds = 420;
+        var timerInterval = null;
+        var isTimerRunning = false;
+
+        var speakerNotes = [
+            {
+                title: "Slide 1: Title Slide",
+                cue: "0:00 - 0:15",
+                script: "Good morning/afternoon, evaluators. Today we present the Apex Banking Management System—an enterprise-grade Neobank web application built entirely using Core Java (JDK 17+), without any external frameworks, libraries, or databases. We will demonstrate how standard Java and disciplined OOP design can achieve production-like financial software."
+            },
+            {
+                title: "Slide 2: Problem Statement & Use Case",
+                cue: "0:15 - 0:55 (40 sec)",
+                script: "Modern banking applications suffer from excessive framework bloat—Spring Boot, Hibernate, and external servers create heavy memory footprints and security risks. Apex Banking proves you can build a resilient, transparent Neobank from pure Core Java. Consider John, who wants to transfer ₹1,200 to Alice. Our system enforces a 2-step PIN, simulates an OTP challenge for transfers over ₹1,000, validates John's ₹500 minimum balance reserve, and atomistically records the transaction."
+            },
+            {
+                title: "Slide 3: Object-Oriented Design & UML",
+                cue: "0:55 - 1:55 (60 sec)",
+                script: "Our architecture strictly embodies the four pillars of OOP. Abstraction is seen in the abstract Account class and our BankService and Storage interfaces. Inheritance is demonstrated by our four account models extending Account. Polymorphism is utilized through dynamic method dispatch in calculateInterest(), where Savings, Current, FD, and RD calculate interest differently. Finally, encapsulation ensures all fields are strictly private with validated mutating methods."
+            },
+            {
+                title: "Slide 4: Core Java Concepts Used",
+                cue: "1:55 - 2:55 (60 sec)",
+                script: "We utilized standard Core Java language features: custom exception classes such as InsufficientFundsException and AccountFrozenException; robust CSV File I/O with BufferedReader/Writer; the Collections framework with ConcurrentHashMap for thread-safe session tracking; and SHA-256 hashing via MessageDigest for password and 4-digit PIN verification. Everything runs on the embedded com.sun.net.httpserver.HttpServer."
+            },
+            {
+                title: "Slide 5: Program Flow & Implementation",
+                cue: "2:55 - 3:55 (60 sec)",
+                script: "Here is our atomic transfer flow. When the client posts a transfer request, BankServer authenticates the session, BankServiceImpl validates the 4-digit PIN hash, checks the simulated OTP if over ₹1,000, checks the daily limit cap, and verifies reserve balances. If valid, it debits the source, credits the recipient, and flushes to disk. Notice the synchronized block in our code snippet—guaranteeing atomic execution."
+            },
+            {
+                title: "Slide 6: Live Application Demonstration",
+                cue: "3:55 - 5:35 (100 sec)",
+                script: "Now let's demonstrate the live application running on localhost:8080. Notice our Live Demo Quick Switcher in the topbar—allowing us to toggle instantly between Admin, Manager, Teller, John, and Alice without typing credentials. First, as John, observe the Neobank dashboard and Transfers Hub with 6 sub-tabs: Direct Transfer, UPI, Beneficiaries, Bills, Standing Instructions, and FX. We execute a transfer with PIN 1234. Next, we open an 8% Fixed Deposit. In one click, we switch to Admin to showcase our live SVG Deposits vs. Withdrawals chart, KYC verification queue, and batch interest runner. There's also an instant Reset button to restore clean demo data."
+            },
+            {
+                title: "Slide 7: Testing, Results & Limitations",
+                cue: "5:35 - 6:15 (40 sec)",
+                script: "We tested critical boundary cases: First, transferring beyond the ₹500 minimum savings balance correctly throws an InsufficientFundsException without mutating balances. Second, 3 failed password attempts automatically locks the account against brute-force attacks. Third, high-value transfers correctly require OTP verification. As an honest limitation, CSV storage is tailored for single-node instances, and in-memory sessions reset on restart."
+            },
+            {
+                title: "Slide 8: Conclusion & Future Enhancements",
+                cue: "6:15 - 6:35 (20 sec)",
+                script: "In conclusion, Apex Banking demonstrates that Core Java combined with disciplined OOP principles provides all the architectural power needed to engineer enterprise-grade financial software without framework bloat. In the future, our Storage interface allows seamless migration to a relational database like PostgreSQL. Thank you, and we welcome your questions."
+            },
+            {
+                title: "Slide 9: Presentation Timing Breakdown",
+                cue: "Review / Reference",
+                script: "This slide outlines our disciplined 7-minute timing allocation. We have paced each section: 40 seconds on Problem, 60 seconds on OOP design, 60 seconds on Java features, 60 seconds on program flow, 100 seconds on the live demo, 40 seconds on testing, and 20 seconds on wrap-up, leaving a 40-second buffer for evaluator Q&A."
+            },
+            {
+                title: "Slide 10: Pre-Presentation Checklist",
+                cue: "Readiness Check",
+                script: "This checklist confirms our complete technical and theoretical readiness: clean zero-warning compilation, pre-seeded test data, functioning dark/light mode, and deep mastery of class responsibilities and design choices. We are fully prepared to answer any technical questions."
+            }
+        ];
+
+        function showSlide(index) {
+            if (index < 1) index = 1;
+            if (index > totalSlides) index = totalSlides;
+            currentSlide = index;
+
+            var slides = document.querySelectorAll('.slide');
+            for (var i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            document.getElementById('slide-' + currentSlide).classList.add('active');
+            document.getElementById('slideIndicator').innerText = 'SLIDE ' + currentSlide + ' OF ' + totalSlides;
+
+            updateNotes();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function updateNotes() {
+            var note = speakerNotes[currentSlide - 1];
+            if (note) {
+                document.getElementById('notesSlideTitle').innerText = note.title;
+                document.getElementById('notesTimeCue').innerText = 'Time: ' + note.cue;
+                document.getElementById('notesContent').innerText = note.script;
+            }
+        }
+
+        function toggleNotes() {
+            document.getElementById('speakerNotesPanel').classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-mode');
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // 7-Minute Timer Engine
+        function formatTimer(sec) {
+            var m = Math.floor(sec / 60);
+            var s = sec % 60;
+            var mm = m < 10 ? '0' + m : m;
+            var ss = s < 10 ? '0' + s : s;
+            return mm + ':' + ss;
+        }
+
+        function toggleTimer() {
+            var btn = document.getElementById('timerToggleBtn');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerText = '▶ Start';
+            } else {
+                isTimerRunning = true;
+                btn.innerText = '⏸ Pause';
+                timerInterval = setInterval(function() {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                        document.getElementById('timerText').innerText = formatTimer(timerSeconds);
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        btn.innerText = 'Finished';
+                        document.getElementById('timerBox').style.borderColor = '#ef4444';
+                        document.getElementById('timerBox').style.color = '#ef4444';
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 420;
+            document.getElementById('timerText').innerText = '07:00';
+            document.getElementById('timerToggleBtn').innerText = '▶ Start';
+            document.getElementById('timerBox').style.borderColor = '';
+            document.getElementById('timerBox').style.color = '';
+        }
+
+        // Keyboard Navigation Support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            } else if (e.key === 'n' || e.key === 'N') {
+                toggleNotes();
+            } else if (e.key === 'Home') {
+                showSlide(1);
+            } else if (e.key === 'End') {
+                showSlide(totalSlides);
+            }
+        });
+
+        // Initialize First Slide & Notes
+        updateNotes();
+    </script>
+</body>
+</html>
